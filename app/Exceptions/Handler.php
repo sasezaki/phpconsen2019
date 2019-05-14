@@ -27,6 +27,19 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+    /**
+     * @var \Illuminate\Contracts\Routing\ResponseFactory
+     */
+    private $responseFactory;
+    /**
+     * @var \Illuminate\Translation\Translator
+     */
+    private $translator;
+    public function __construct(\Illuminate\Contracts\Routing\ResponseFactory $responseFactory, \Illuminate\Translation\Translator $translator)
+    {
+        $this->responseFactory = $responseFactory;
+        $this->translator = $translator;
+    }
 
     /**
      * Report or log an exception.
@@ -49,7 +62,7 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if ($exception instanceof DomainRuleException) {
-            return response()->json(['message' => trans($exception->getMessage())], Res::HTTP_BAD_REQUEST);
+            return $this->responseFactory->json(['message' => $this->translator->trans($exception->getMessage())], Res::HTTP_BAD_REQUEST);
         }
 
         return parent::render($request, $exception);

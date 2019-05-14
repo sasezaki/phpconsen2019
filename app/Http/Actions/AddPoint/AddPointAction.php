@@ -10,13 +10,18 @@ class AddPointAction
 {
     /** @var AddPointUseCase */
     private $useCase;
+    /**
+     * @var \Illuminate\Contracts\Routing\ResponseFactory
+     */
+    private $responseFactory;
 
     /**
      * @param AddPointUseCase $useCase
      */
-    public function __construct(AddPointUseCase $useCase)
+    public function __construct(AddPointUseCase $useCase, \Illuminate\Contracts\Routing\ResponseFactory $responseFactory)
     {
         $this->useCase = $useCase;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -31,6 +36,6 @@ class AddPointAction
 
         $customerPoint = $this->useCase->run($customerId, $addPoint);
 
-        return response()->json(['customer_point' => $customerPoint]);
+        return $this->responseFactory->json(['customer_point' => $customerPoint]);
     }
 }

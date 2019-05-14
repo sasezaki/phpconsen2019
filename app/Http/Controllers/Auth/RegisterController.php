@@ -29,15 +29,25 @@ class RegisterController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+    /**
+     * @var \Illuminate\Validation\Factory
+     */
+    private $factory;
+    /**
+     * @var \Illuminate\Contracts\Hashing\Hasher
+     */
+    private $hasher;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(\Illuminate\Validation\Factory $factory, \Illuminate\Contracts\Hashing\Hasher $hasher)
     {
         $this->middleware('guest');
+        $this->factory = $factory;
+        $this->hasher = $hasher;
     }
 
     /**
@@ -48,7 +58,7 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        return $this->factory->make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
@@ -66,7 +76,7 @@ class RegisterController extends Controller
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => $this->hasher->make($data['password']),
         ]);
     }
 }

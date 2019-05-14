@@ -17,6 +17,14 @@ class EloquentCustomerPoint extends Model
     public $timestamps = false;
     protected $primaryKey = null;
     public $incrementing = false;
+    /**
+     * @var \Illuminate\Database\DatabaseManager
+     */
+    private $databaseManager;
+    public function __construct(\Illuminate\Database\DatabaseManager $databaseManager)
+    {
+        $this->databaseManager = $databaseManager;
+    }
 
     /**
      * @param int $customerId
@@ -25,13 +33,10 @@ class EloquentCustomerPoint extends Model
      */
     public function addPoint(int $customerId, int $point): bool
     {
-        return DB::update(
-            'update customer_points set point=point+:point where customer_id=:customer_id',
-            [
-                    'point'       => $point,
-                    'customer_id' => $customerId,
-                ]
-        ) === 1;
+        return $this->databaseManager->update('update customer_points set point=point+:point where customer_id=:customer_id', [
+                'point'       => $point,
+                'customer_id' => $customerId,
+            ]) === 1;
     }
 
     /**

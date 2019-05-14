@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\Auth;
 class RedirectIfAuthenticated
 {
     /**
+     * @var \Illuminate\Auth\AuthManager
+     */
+    private $authManager;
+    /**
+     * @var \Illuminate\Routing\Redirector
+     */
+    private $redirector;
+    public function __construct(\Illuminate\Auth\AuthManager $authManager, \Illuminate\Routing\Redirector $redirector)
+    {
+        $this->authManager = $authManager;
+        $this->redirector = $redirector;
+    }
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -17,8 +30,8 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (Auth::guard($guard)->check()) {
-            return redirect('/home');
+        if ($this->authManager->guard($guard)->check()) {
+            return $this->redirector->back('/home');
         }
 
         return $next($request);
